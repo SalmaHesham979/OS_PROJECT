@@ -27,7 +27,6 @@ def start_app():
         canvas_s.delete("all")
         for t in [tree_res_p, tree_res_s]:
             for item in t.get_children(): t.delete(item)
-        # تصفير الـ 3 متوسطات في الواجهة
         lbl_avg_p.config(text="Avg -> WT: 0, TAT: 0, RT: 0")
         lbl_avg_s.config(text="Avg -> WT: 0, TAT: 0, RT: 0")
         text_summary.config(state="normal");
@@ -35,35 +34,49 @@ def start_app():
         text_summary.config(state="disabled")
 
     def add_process():
+        errors = []  # قائمة لتجميع كل الأخطاء
+        pid = entry_pid.get().strip()
+
+        # 1. التحقق من أن الخانات ليست فارغة أولاً
+        if not (pid and entry_arrival.get().strip() and entry_burst.get().strip() and entry_priority.get().strip()):
+            messagebox.showerror("Error", "All fields must be filled!")
+            return
+
+        # 2. التحقق من صحة الأرقام وكل خطأ على حدة
+        at_val, bt_val, pr_val = 0, 0, 0
+
         try:
-            pid = entry_pid.get().strip()
-            at_text = entry_arrival.get().strip()
-            bt_text = entry_burst.get().strip()
-            pr_text = entry_priority.get().strip()
-
-            if not (pid and at_text and bt_text and pr_text):
-                messagebox.showerror("Error", "Please fill all fields!")
-                return
-
-            at, bt, pr = int(at_text), int(bt_text), int(pr_text)
-
-            # Validations الصارمة
-            if at < 0:
-                messagebox.showerror("Error", "Arrival Time cannot be negative!")
-                return
-            if bt <= 0:
-                messagebox.showerror("Error", "Burst Time must be greater than zero!")
-                return
-            if any(p.pid == pid for p in all_processes):
-                messagebox.showerror("Error", f"Process ID '{pid}' already exists!")
-                return
-
-            all_processes.append(Process(pid, at, bt, pr))
-            tree.insert('', 'end', values=(pid, at, bt, pr))
-            for e in [entry_pid, entry_arrival, entry_burst, entry_priority]: e.delete(0, tk.END)
-            entry_pid.focus()
+            at_val = int(entry_arrival.get().strip())
+            if at_val < 0: errors.append("- Arrival Time cannot be negative.")
         except ValueError:
-            messagebox.showerror("Error", "Please enter valid numbers!")
+            errors.append("- Arrival Time must be a valid number.")
+
+        try:
+            bt_val = int(entry_burst.get().strip())
+            if bt_val <= 0: errors.append("- Burst Time must be greater than zero.")
+        except ValueError:
+            errors.append("- Burst Time must be a valid number.")
+
+        try:
+            pr_val = int(entry_priority.get().strip())
+        except ValueError:
+            errors.append("- Priority must be a valid number.")
+
+        # 3. التحقق من تكرار الـ ID
+        if any(p.pid == pid for p in all_processes):
+            errors.append(f"- Process ID '{pid}' already exists.")
+
+        # 4. عرض كل الأخطاء المجمعة في رسالة واحدة
+        if errors:
+            full_error_msg = "Please fix the following issues:\n\n" + "\n".join(errors)
+            messagebox.showerror("Validation Error", full_error_msg)
+            return
+
+        # 5. إذا لم توجد أخطاء، يتم الإضافة بنجاح
+        all_processes.append(Process(pid, at_val, bt_val, pr_val))
+        tree.insert('', 'end', values=(pid, at_val, bt_val, pr_val))
+        for e in [entry_pid, entry_arrival, entry_burst, entry_priority]: e.delete(0, tk.END)
+        entry_pid.focus()
 
     def load_test_case(case_type):
         clear_data()
@@ -71,7 +84,7 @@ def start_app():
             "Normal": [("P1", 0, 8, 3), ("P2", 2, 4, 1), ("P3", 4, 6, 2)],
             "Conflict": [("P1", 0, 5, 2), ("P2", 0, 3, 2), ("P3", 5, 2, 1)],
             "Starvation": [("P1", 0, 15, 10), ("P2", 1, 2, 1), ("P3", 2, 2, 1), ("P4", 3, 2, 1)],
-            "Invalid": [("P_Err", -1, 0, 1)]
+            "Invalid": [("P_Error", -3, 0, 1)]  # حالة تجمع خطأين مع بعض
         }
         if case_type == "Invalid":
             p = cases["Invalid"][0]
@@ -79,7 +92,7 @@ def start_app():
             entry_arrival.insert(0, p[1]);
             entry_burst.insert(0, p[2]);
             entry_priority.insert(0, p[3])
-            messagebox.showinfo("Test", "Invalid Case loaded! Click Add to test validations.")
+            messagebox.showinfo("Test", "Invalid Case loaded! Click Add to see multiple errors in one message.")
         elif case_type in cases:
             for p in cases[case_type]:
                 all_processes.append(Process(p[0], p[1], p[2], p[3]))
@@ -100,29 +113,21 @@ def start_app():
         if not all_processes: return
         p_data, s_data = copy.deepcopy(all_processes), copy.deepcopy(all_processes)
         g_p, g_s = run_priority_preemptive(p_data), run_srtf(s_data)
-
         draw_gantt(canvas_p, g_p);
         draw_gantt(canvas_s, g_s)
-
-        # ملء الجداول وحساب الـ 3 متوسطات
         pm = fill_res(tree_res_p, p_data, lbl_avg_p)
         sm = fill_res(tree_res_s, s_data, lbl_avg_s)
-
         generate_summary(pm, sm)
         notebook.select(tab2)
 
     def fill_res(t, data, l):
         for i in t.get_children(): t.delete(i)
-        for p in data:
-            t.insert('', 'end', values=(p.pid, p.waiting_time, p.turnaround_time, p.response_time))
-
+        for p in data: t.insert('', 'end', values=(p.pid, p.waiting_time, p.turnaround_time, p.response_time))
         n = len(data)
-        # حساب الـ WT والـ TAT والـ RT
+        # حساب المتوسطات الثلاثة
         avg_wt = sum(p.waiting_time for p in data) / n
         avg_tat = sum(p.turnaround_time for p in data) / n
         avg_rt = sum(p.response_time for p in data) / n
-
-        # تحديث الـ Label بالـ 3 أرقام
         l.config(text=f"Avg -> WT: {avg_wt:.2f}, TAT: {avg_tat:.2f}, RT: {avg_rt:.2f}")
         return avg_wt, avg_tat, avg_rt
 
@@ -130,18 +135,19 @@ def start_app():
         text_summary.config(state="normal");
         text_summary.delete("1.0", tk.END)
         winner = "SRTF" if sm[0] < pm[0] else "Priority"
-        summary = f"--- SIMULATION COMPARISON ---\n\n"
-        summary += f"1. Average Response Time: Priority ({pm[2]:.2f}) vs SRTF ({sm[2]:.2f})\n"
-        summary += f"2. Efficiency Winner: {winner} has the lowest Average Waiting Time.\n\n"
-        summary += "--- KEY OBSERVATIONS ---\n"
-        summary += "- Response Time: Measures how quickly a process starts its first execution.\n"
-        summary += "- Tie-breaking: If priority/burst is equal, earliest arrival (FCFS) wins.\n"
+        summary = f"--- SIMULATION CONCLUSION & SUMMARY ---\n\n"
+        summary += f"- Performance Winner: {winner} (Based on WT: {min(sm[0], pm[0]):.2f})\n"
+        summary += f"- Efficiency (Avg WT): Priority {pm[0]:.2f} | SRTF {sm[0]:.2f}\n"
+        summary += f"- Responsiveness (Avg RT): Priority {pm[2]:.2f} | SRTF {sm[2]:.2f}\n\n"
+        summary += "--- VALIDATION NOTES ---\n"
+        summary += "- Multi-Error Catching: The system identifies all invalid inputs simultaneously.\n"
+        summary += "- Tie-breaking: FCFS is used as a tie-breaker for equal priorities."
         text_summary.insert(tk.END, summary);
         text_summary.config(state="disabled")
 
     # --- 2. بناء الواجهة (UI) ---
     root = tk.Tk()
-    root.title("CPU Scheduler - Razan & Team (7 Stars)")
+    root.title("CPU Scheduling Simulator - Black & Pink Edition")
     root.geometry("1150x900");
     root.configure(bg=color_bg)
 
@@ -155,20 +161,19 @@ def start_app():
     style.configure("Treeview.Heading", background=color_pink, foreground="black", font=("Arial", 10, "bold"))
 
     notebook = ttk.Notebook(root)
-    tab1 = tk.Frame(notebook, bg=color_bg);
-    tab2 = tk.Frame(notebook, bg=color_bg)
+    tab1, tab2 = tk.Frame(notebook, bg=color_bg), tk.Frame(notebook, bg=color_bg)
     notebook.add(tab1, text=" 1. CONFIGURATION ");
     notebook.add(tab2, text=" 2. ANALYSIS & RESULTS ")
     notebook.pack(expand=True, fill="both")
 
-    # Tab 1: Input Panel
+    # Tab 1
     input_f = tk.LabelFrame(tab1, text=" Add New Process ", bg=color_bg, fg=color_pink, font=("Arial", 11, "bold"),
                             padx=15, pady=15)
     input_f.pack(fill="x", padx=25, pady=20)
 
-    lbls = ["Process ID:", "Arrival Time:", "Burst Time:", "Priority:"]
+    lbls_names = ["Process ID:", "Arrival Time:", "Burst Time:", "Priority:"]
     vars_names = ["entry_pid", "entry_arrival", "entry_burst", "entry_priority"]
-    for i, txt in enumerate(lbls):
+    for i, txt in enumerate(lbls_names):
         tk.Label(input_f, text=txt, bg=color_bg, fg=color_white, font=("Arial", 10)).grid(row=0, column=i * 2, padx=10)
         globals()[vars_names[i]] = tk.Entry(input_f, width=12, bg=color_input, fg=color_white,
                                             insertbackground=color_white, relief="flat", highlightthickness=1,
@@ -178,7 +183,6 @@ def start_app():
     tk.Button(input_f, text="+ Add Process", command=add_process, bg=color_pink, fg="black", font=("Arial", 10, "bold"),
               relief="flat", padx=15).grid(row=0, column=8, padx=25)
 
-    # Action Buttons
     btn_f = tk.Frame(tab1, bg=color_bg);
     btn_f.pack(fill="x", padx=25)
     for c in ["Normal", "Conflict", "Starvation", "Invalid"]:
@@ -197,7 +201,7 @@ def start_app():
                                                                                                             anchor="center")
     tree.pack(fill="both", expand=True, padx=25, pady=20)
 
-    # Tab 2: Results
+    # Tab 2
     gf = tk.LabelFrame(tab2, text=" Gantt Charts ", bg=color_bg, fg=color_pink, font=("Arial", 11, "bold"), padx=15,
                        pady=10)
     gf.pack(fill="x", padx=25, pady=10)
@@ -215,7 +219,6 @@ def start_app():
         t = ttk.Treeview(f, columns=("ID", "WT", "TAT", "RT"), show='headings', height=6)
         for c in ("ID", "WT", "TAT", "RT"): t.heading(c, text=c); t.column(c, width=65, anchor="center")
         t.pack(fill="both");
-        # الـ Label اللي تحت كل جدول بـ 3 متوسطات
         l = tk.Label(f, text="Avg -> WT: 0, TAT: 0, RT: 0", bg=color_bg, fg=color_pink, font=("Arial", 10, "bold"))
         l.pack(pady=8)
         if name == "Priority":
