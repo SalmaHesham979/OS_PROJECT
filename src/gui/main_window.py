@@ -134,7 +134,7 @@ def start_app():
         summary += "--- TIE-BREAKING STRATEGY (3-LEVELS) ---\n"
         summary += "1. Primary: Priority Level (Priority) or Remaining Time (SRTF).\n"
         summary += "2. Secondary: Arrival Time (FCFS).\n"
-        summary += "3. Tertiary: PID (Lexicographical) - Final tie-breaker for simultaneous events.\n"
+        summary += "3. Final Step: If arrival and priority are equal, the process with the smaller ID wins.\n"
         text_summary.insert(tk.END, summary);
         text_summary.config(state="disabled")
 
