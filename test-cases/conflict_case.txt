@@ -1,0 +1,52 @@
+============================================================
+        TEST SCENARIO: CONFLICT CASE (TIE-BREAK)
+============================================================
+Description: This scenario tests how the system handles two processes (P1, P2) arriving at the same time (T=0) with identical priorities (2).
+
+INPUT DATA:
+| Process | Arrival Time | Burst Time | Priority |
+|---------|--------------|------------|----------|
+| P1      | 0            | 5          | 2        |
+| P2      | 0            | 3          | 2        |
+| P3      | 5            | 2          | 1        |
+
+------------------------------------------------------------
+1. PRIORITY PREEMPTIVE RESULTS
+------------------------------------------------------------
+Gantt Chart:
+|  P1  |  P3  |  P2  |
+0      5      7     10
+
+Output Metrics:
+| Process | WT | TAT | RT |
+|---------|----|-----|----|
+| P1      | 0  | 5   | 0  |
+| P2      | 7  | 10  | 7  |
+| P3      | 0  | 2   | 0  |
+|---------|----|-----|----|
+| AVERAGE | 2.33| 5.67| 2.33 |
+
+------------------------------------------------------------
+2. SRTF RESULTS
+------------------------------------------------------------
+Gantt Chart:
+|  P2  |  P1  |  P3  |  P1  |
+0      3      5      7     10
+
+Output Metrics:
+| Process | WT | TAT | RT |
+|---------|----|-----|----|
+| P1      | 5  | 10  | 3  |
+| P2      | 0  | 3   | 0  |
+| P3      | 0  | 2   | 0  |
+|---------|----|-----|----|
+| AVERAGE | 1.67| 5.00| 1.00 |
+
+KEY OBSERVATIONS:
+1. Priority Tie-break: At T=0, both P1 and P2 had the same Arrival and Priority. The algorithm chose P1 first because it has a smaller Process ID (P1 < P2).
+2. SRTF Logic: At T=0, SRTF chose P2 first, even though it arrived with P1, because P2 has a shorter Burst Time (3 vs 5). This explains why SRTF achieved a better Avg WT.
+3. Mid-Execution Preemption: In SRTF, P3 arrived at T=5 and immediately preempted the remaining part of P1 because P3's priority (1) was higher.
+4. Performance Gap: In this conflict, SRTF significantly outperformed Priority in all metrics (WT, TAT, and RT).
+
+CONCLUSION:
+SRTF is the clear winner in this scenario. It resolved the initial conflict by choosing the shorter job, leading to better overall system efficiency.

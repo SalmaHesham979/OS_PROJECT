@@ -1,0 +1,51 @@
+============================================================
+           TEST SCENARIO: NORMAL CASE (STANDARD)
+============================================================
+Description: A basic mix of processes with different arrival times,burst times, and priorities to test the core logic of preemption.
+
+INPUT DATA:
+| Process | Arrival Time | Burst Time | Priority |
+|---------|--------------|------------|----------|
+| P1      | 0            | 8          | 3        |
+| P2      | 2            | 4          | 1        |
+| P3      | 4            | 6          | 2        |
+
+------------------------------------------------------------
+1. PRIORITY PREEMPTIVE RESULTS
+------------------------------------------------------------
+Gantt Chart:
+|  P1  |  P2  |  P3  |  P1  |
+0      2      6     12     18
+
+Output Metrics:
+| Process | WT | TAT | RT |
+|---------|----|-----|----|
+| P1      | 10 | 18  | 0  |
+| P2      | 0  | 4   | 0  |
+| P3      | 2  | 8   | 2  |
+|---------|----|-----|----|
+| AVERAGE | 4.00| 10.00| 0.67 |
+
+------------------------------------------------------------
+2. SRTF RESULTS
+------------------------------------------------------------
+Gantt Chart:
+|  P1  |  P2  |  P1  |  P3  |
+0      2      6     12     18
+
+Output Metrics:
+| Process | WT | TAT | RT |
+|---------|----|-----|----|
+| P1      | 4  | 12  | 0  |
+| P2      | 0  | 4   | 0  |
+| P3      | 8  | 14  | 8  |
+|---------|----|-----|----|
+| AVERAGE | 4.00| 10.00| 2.67 |
+
+KEY OBSERVATIONS:
+1. Preemption: At T=2, P2 successfully preempted P1 because it has a higher priority (1 vs 3).
+2. SRTF vs Priority: While both algorithms achieved the same Avg WT (4.00), the Priority algorithm was significantly faster in responding to processes (Avg RT = 0.67 vs 2.67).
+3. Context Switching: The Gantt charts clearly show P1 being pushed to the end of the timeline as more "important" or "shorter" tasks arrive.
+
+CONCLUSION:
+Both algorithms are efficient for this workload, but Priority Preemptive is recommended here for its superior Response Time.
