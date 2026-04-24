@@ -1,14 +1,17 @@
 # OS_PROJECT
 # CPU Scheduling Simulator
 
-### 1. Project Description
-This project is a CPU Scheduling Simulator built with Python and Tkinter. It allows users to simulate and compare two major scheduling algorithms:
-• Priority Preemptive Scheduling
+A complete, interactive desktop application to visualize, compare, and analyze CPU Scheduling Algorithms.
+###  📖 Project Description
+The CPU Scheduling Simulator is a high-fidelity, graphical desktop application developed in Python with the Tkinter library. It allows users to simulate and compare two major scheduling algorithms using the **same workload** to ensure a fair and valid comparison:
+
+• Preemptive Priority Scheduling: A method where execution is determined strictly by the priority level assigned to each process.
+
 • Shortest Remaining Time First (SRTF)
 The system provides a visual representation using Gantt Charts and calculates key performance metrics like Waiting Time, Turnaround Time, and Response Time.
 
-### 2. Team Members (7 Stars)
-This project was developed by a team of 2nd-year students at Misr University for Science and Technology (MUST):
+---
+###  👥 Team Members
 1. Salma Hesham Elsayed Shawkey
 2. Salma Mohamed Ramadan Mohamed
 3. Razan Mohammed Hussien Abdl-ALeem
@@ -16,25 +19,58 @@ This project was developed by a team of 2nd-year students at Misr University for
 5. 
 6. 
 7. 
+---
+### ✨ Key Features & Capabilities
 
-### 3. Features
-• Advanced GUI: Designed with a Black & Pink modern theme.
-• Multi-Error Validation: Detects multiple invalid inputs (negative arrival, zero burst, duplicate IDs) simultaneously.
-• Detailed Analytics: Provides Average WT, TAT, and RT for both algorithms.
-• Pre-defined Test Cases: Includes Normal, Conflict, and Starvation scenarios for quick testing.
+*   **Modern Interactive GUI:** A premium "Black & Pink" dark-mode interface split into two main sections: **Configuration** and **Analysis & Results**.
+*   **Robust Input Validation:** The system strictly prevents invalid inputs (e.g., negative arrival times, zero burst times, missing data, or duplicate Process IDs) with descriptive error dialogs.
+*   **Pre-built Test Scenarios:** Instantly load complex edge cases to test system behavior:
+    *   *Normal:* Standard execution flow.
+    *   *Conflict:* Multiple processes arriving simultaneously.
+    *   *Starvation:* Testing how low-priority tasks behave when overwhelmed by high-priority tasks.
+*   **Dynamic Gantt Chart Rendering:** Accurately visualizes execution timelines, clearly displaying process preemption (when a process is paused and resumed).
+*   **Advanced Tie-Breaking Strategy:** In the event of a tie, the system relies on a strict 3-tier hierarchy to prevent crashes:
+    1.  *Primary:* Priority Level (for Priority) or Remaining Time (for SRTF).
+    2.  *Secondary:* First Come, First Served (Arrival Time).
+    3.  *Final:* If both the primary criteria and arrival times are identical, the process with the lower ID number is granted precedence.
+*   **Mathematical Metric Calculation:** Automatically calculates the following for every single process:
+    *   Waiting Time (WT): The total duration a process spends in the ready queue.$$\text{Waiting Time} = \text{Turnaround Time} - \text{Burst Time}$$
+    *   Turnaround Time (TAT): The total time taken from process submission to its completion.$$\text{Turnaround Time} = \text{Completion Time} - \text{Arrival Time}$$
+    *   Response Time (RT): The time elapsed from process arrival until it first gains CPU access.$$\text{Response Time} = \text{First CPU Allocation Time} - \text{Arrival Time}$$
+---
 
-### 4. Requirements
-To run this simulator, you need:
-• Python 3.10 or higher.
-• Tkinter library (usually bundled with Python).
+### ⚙️ Requirements
+To successfully run this application, your environment must meet the following specifications:
 
-### 5. How to Run
-1. Clone or Download the project files.
-2. Open your terminal or command prompt in the project directory.
-3. Run the command: python main.py
+*   **Python Version:** Python 3.6 or higher must be installed.
+*   **System Libraries:** 
+    *   `tkinter` 
+    
 
-### 6. Tie-Breaking Strategy
-In case of simultaneous events, the simulator follows these rules:
-1. Priority/Remaining Time: Primary rule.
-2. Arrival Time (FCFS): If the primary metric is equal.
-3. Process ID (PID): The process with the smaller ID wins as a final tie-breaker
+---
+
+### 🚀 Build and Run Steps
+
+Follow these exact steps to launch the simulator on your machine:
+
+1.  **Extract the Project:** Unzip the downloaded project folder to your local machine (e.g., your Desktop).
+2.  **Open Terminal / Command Prompt:** Open your command-line interface.
+3.  **Verify Python Installation:** Ensure Python is active by typing:
+    ```bash
+    python --version
+    ```
+    *(Note: If you are on macOS/Linux, you might need to type `python3 --version`)*
+4.  **Navigate to the Source Directory:** Use the `cd` command to move into the `src` folder where the main executable is located:
+    ```bash
+    cd Desktop/OS_PROJECT/OS_PROJECT/src
+    ```
+    *(Adjust the path based on exactly where you extracted the folder).*
+5.  **Run the Application:** Execute the main Python script to launch the GUI:
+    ```bash
+    python main.py
+    ```
+    *(Again, use `python3 main.py` if required by your OS).*
+
+---
+
+
