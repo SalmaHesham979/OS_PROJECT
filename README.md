@@ -34,9 +34,9 @@ The system provides a visual representation using Gantt Charts and calculates ke
     2.  *Secondary:* First Come, First Served (Arrival Time).
     3.  *Final:* If both the primary criteria and arrival times are identical, the process with the lower ID number is granted precedence.
 *   **Mathematical Metric Calculation:** Automatically calculates the following for every single process:
-    *   Waiting Time (WT): The total duration a process spends in the ready queue.$$\text{Waiting Time} = \text{Turnaround Time} - \text{Burst Time}$$
-    *   Turnaround Time (TAT): The total time taken from process submission to its completion.$$\text{Turnaround Time} = \text{Completion Time} - \text{Arrival Time}$$
-    *   Response Time (RT): The time elapsed from process arrival until it first gains CPU access.$$\text{Response Time} = \text{First CPU Allocation Time} - \text{Arrival Time}$$
+    *   Waiting Time (WT)
+    *   Turnaround Time (TAT)
+    *   Response Time (RT)
 ---
 
 ### ⚙️ Requirements
