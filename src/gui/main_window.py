@@ -6,6 +6,8 @@ import copy
 from model.process import Process
 from scheduler.priority import run_priority_preemptive
 from scheduler.srtf import run_srtf
+from metrics.calculator import calculate_averages
+from util.validators import validate_process_input
 
 
 def start_app():
@@ -34,38 +36,24 @@ def start_app():
         text_summary.config(state="disabled")
 
     def add_process():
-        errors = []  # قائمة لتجميع كل الأخطاء
         pid = entry_pid.get().strip()
+        arrival = entry_arrival.get().strip()
+        burst = entry_burst.get().strip()
+        priority = entry_priority.get().strip()
 
-        if not (pid and entry_arrival.get().strip() and entry_burst.get().strip() and entry_priority.get().strip()):
-            messagebox.showerror("Error", "All fields must be filled!")
+        is_valid, errors, parsed_values = validate_process_input(
+            pid, arrival, burst, priority, all_processes
+        )
+
+        if not is_valid:
+            if errors == ["All fields must be filled!"]:
+                messagebox.showerror("Error", "All fields must be filled!")
+            else:
+                full_error_msg = "Please fix the following issues:\n\n" + "\n".join(errors)
+                messagebox.showerror("Validation Error", full_error_msg)
             return
 
-        at_val, bt_val, pr_val = 0, 0, 0
-        try:
-            at_val = int(entry_arrival.get().strip())
-            if at_val < 0: errors.append("- Arrival Time cannot be negative.")
-        except ValueError:
-            errors.append("- Arrival Time must be a valid number.")
-
-        try:
-            bt_val = int(entry_burst.get().strip())
-            if bt_val <= 0: errors.append("- Burst Time must be greater than zero.")
-        except ValueError:
-            errors.append("- Burst Time must be a valid number.")
-
-        try:
-            pr_val = int(entry_priority.get().strip())
-        except ValueError:
-            errors.append("- Priority must be a valid number.")
-
-        if any(p.pid == pid for p in all_processes):
-            errors.append(f"- Process ID '{pid}' already exists.")
-
-        if errors:
-            full_error_msg = "Please fix the following issues:\n\n" + "\n".join(errors)
-            messagebox.showerror("Validation Error", full_error_msg)
-            return
+        at_val, bt_val, pr_val = parsed_values
 
         all_processes.append(Process(pid, at_val, bt_val, pr_val))
         tree.insert('', 'end', values=(pid, at_val, bt_val, pr_val))
@@ -117,9 +105,9 @@ def start_app():
     def fill_res(t, data, l):
         for i in t.get_children(): t.delete(i)
         for p in data: t.insert('', 'end', values=(p.pid, p.waiting_time, p.turnaround_time, p.response_time))
-        n = len(data)
-        avg_wt, avg_tat, avg_rt = sum(p.waiting_time for p in data) / n, sum(p.turnaround_time for p in data) / n, sum(
-            p.response_time for p in data) / n
+        
+        avg_wt, avg_tat, avg_rt = calculate_averages(data)
+        
         l.config(text=f"Avg -> WT: {avg_wt:.2f}, TAT: {avg_tat:.2f}, RT: {avg_rt:.2f}")
         return avg_wt, avg_tat, avg_rt
 
