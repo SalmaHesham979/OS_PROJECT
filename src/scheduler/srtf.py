@@ -18,7 +18,7 @@ def run_srtf(processes):
             continue
 
         # الفرق هنا: بنختار صاحب أقل Remaining Time
-        current_p = min(available, key=lambda x: (x.remaining_time, x.arrival_time))
+        current_p = min(available, key=lambda x: (x.remaining_time, x.arrival_time, x.pid))
 
         if current_p.start_time == -1:
             current_p.start_time = current_time

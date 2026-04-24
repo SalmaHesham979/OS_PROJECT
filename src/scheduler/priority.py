@@ -21,7 +21,7 @@ def run_priority_preemptive(processes):
 
         # 3. اختار صاحب أعلى أولوية (أقل رقم)
         # ولو تساووا، اختار اللي وصل الأول (Tie-breaking)
-        current_p = min(available, key=lambda x: (x.priority, x.arrival_time))
+        current_p = min(available, key=lambda x: (x.priority, x.arrival_time, x.pid))
 
         # 4. سجل أول مرة دخل فيها الـ CPU عشان الـ Response Time
         if current_p.start_time == -1:

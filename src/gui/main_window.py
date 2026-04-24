@@ -73,6 +73,7 @@ def start_app():
         entry_pid.focus()
 
     def load_test_case(case_type):
+        for e in [entry_pid, entry_arrival, entry_burst, entry_priority]: e.delete(0, tk.END)
         clear_data()
         cases = {
             "Normal": [("P1", 0, 8, 3), ("P2", 2, 4, 1), ("P3", 4, 6, 2)],
