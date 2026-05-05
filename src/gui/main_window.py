@@ -65,8 +65,8 @@ def start_app():
         clear_data()
         cases = {
             "Normal": [("P1", 0, 8, 3), ("P2", 2, 4, 1), ("P3", 4, 6, 2)],
-            "Conflict": [("P1", 0, 5, 2), ("P2", 0, 3, 2), ("P3", 5, 2, 1)],
-            "Starvation": [("P1", 0, 15, 10), ("P2", 1, 2, 1), ("P3", 2, 2, 1), ("P4", 3, 2, 1)],
+            "Conflict": [("P1", 0, 10, 1), ("P2", 1, 2, 5), ("P3", 2, 1, 5)],
+            "Starvation": [("P1", 0, 20, 10), ("P2", 1, 3, 1), ("P3", 3, 3, 1), ("P4", 5, 3, 1), ("P5", 7, 3, 1)],
             "Invalid": [("P_Error", -3, 0, 1)]
         }
         if case_type == "Invalid":
@@ -114,16 +114,57 @@ def start_app():
     def generate_summary(pm, sm):
         text_summary.config(state="normal");
         text_summary.delete("1.0", tk.END)
-        winner = "SRTF" if sm[0] < pm[0] else "Priority"
-        # الـ Summary اللي عجبك يا رزان
-        summary = f"--- SIMULATION CONCLUSION & SUMMARY ---\n\n"
-        summary += f"- Performance Winner: {winner} (Based on WT: {min(sm[0], pm[0]):.2f} ms)\n"
-        summary += f"- Priority Stats: Avg WT = {pm[0]:.2f}, Avg TAT = {pm[1]:.2f}, Avg RT = {pm[2]:.2f}\n"
-        summary += f"- SRTF Stats: Avg WT = {sm[0]:.2f}, Avg TAT = {sm[1]:.2f}, Avg RT = {sm[2]:.2f}\n\n"
-        summary += "--- TIE-BREAKING STRATEGY (3-LEVELS) ---\n"
-        summary += "1. Primary: Priority Level (Priority) or Remaining Time (SRTF).\n"
-        summary += "2. Secondary: Arrival Time (FCFS).\n"
-        summary += "3. Final Step: If arrival and priority are equal, the process with the smaller ID wins.\n"
+
+        wt_winner = "SRTF" if sm[0] < pm[0] else ("Priority" if pm[0] < sm[0] else "TIE")
+        tat_winner = "SRTF" if sm[1] < pm[1] else ("Priority" if pm[1] < sm[1] else "TIE")
+        rt_winner = "SRTF" if sm[2] < pm[2] else ("Priority" if pm[2] < sm[2] else "TIE")
+        overall = "SRTF" if sm[0] < pm[0] else "Priority"
+
+        summary = f"""═══════════════════════════════════════════════
+         SIMULATION CONCLUSION & COMPARISON
+═══════════════════════════════════════════════
+
+► Priority Rule: Smaller number = Higher priority (Preemptive)
+► Tie-breaking: 1) Priority/Remaining → 2) Arrival Time → 3) Process ID
+
+───────────── METRIC COMPARISON ─────────────
+
+  Q1: Which algorithm produced the lower average Waiting Time?
+      • Priority Avg WT : {pm[0]:.2f} ms
+      • SRTF Avg WT     : {sm[0]:.2f} ms
+      ✓ Answer: {wt_winner}
+
+  Q2: Which algorithm produced the lower average Response Time?
+      • Priority Avg RT : {pm[2]:.2f} ms
+      • SRTF Avg RT     : {sm[2]:.2f} ms
+      ✓ Answer: {rt_winner}
+
+  Q3: Did priority values improve treatment of urgent processes?
+      ✓ YES — Priority Scheduling guarantees that processes with
+        higher priority (lower number) are served first, regardless
+        of burst time. This benefits urgent/critical tasks.
+
+  Q4: Did SRTF favor short jobs more aggressively?
+      ✓ YES — SRTF always preempts the running process when a
+        shorter remaining job arrives, aggressively favoring short
+        burst times over any other criterion.
+
+  Q5: Which algorithm would you recommend?
+      ✓ Overall winner: {overall} (based on lower Avg WT)
+      • For time-sensitive urgent tasks → use Priority
+      • For maximum CPU efficiency     → use SRTF
+
+───────────── TRADE-OFF ANALYSIS ─────────────
+
+  • FAIRNESS: Priority may starve low-priority processes
+    indefinitely if high-priority jobs keep arriving.
+  • STARVATION: SRTF may starve LONG jobs regardless of
+    their importance or priority level.
+  • KEY DIFFERENCE: Priority = policy-based service (by urgency)
+                    SRTF = burst-time-based service (by efficiency)
+
+═══════════════════════════════════════════════
+"""
         text_summary.insert(tk.END, summary);
         text_summary.config(state="disabled")
 
@@ -161,6 +202,8 @@ def start_app():
         globals()[vars[i]].grid(row=0, column=i * 2 + 1)
     tk.Button(input_f, text="+ Add Process", command=add_process, bg=color_pink, fg="black", font=("Arial", 10, "bold"),
               relief="flat", padx=15).grid(row=0, column=8, padx=25)
+    tk.Label(input_f, text="★ Priority Rule: Lower Number = Higher Priority  |  Range: 0–10  |  Preemptive Mode",
+             bg=color_bg, fg=color_pink, font=("Arial", 9, "italic")).grid(row=1, column=0, columnspan=9, pady=(8, 0))
 
     btn_f = tk.Frame(tab1, bg=color_bg);
     btn_f.pack(fill="x", padx=25)
