@@ -88,7 +88,7 @@ def start_app():
     def run_simulation():
         if not all_processes: return
         p_data, s_data = copy.deepcopy(all_processes), copy.deepcopy(all_processes)
-        # تشغيل الخوارزميات مع الـ Tie-breaking المحدث (PID)
+
         g_p, g_s = run_priority_preemptive(p_data), run_srtf(s_data)
 
         draw_gantt(canvas_p, g_p);
@@ -169,7 +169,7 @@ def start_app():
         # Update the height of the text box to fit the text perfectly without scrolling
         text_summary.config(height=num_lines, state="disabled")
 
-    # --- 2. بناء الواجهة (UI) ---
+    # --- (UI) ---
     root = tk.Tk();
     root.title("CPU Scheduling Simulator - Black & Pink Premium");
     root.geometry("1150x900");
@@ -217,7 +217,7 @@ def start_app():
     tk.Button(btn_f, text="Clear", command=clear_data, bg=color_card, fg=color_white, relief="flat", padx=15).pack(
         side="right", padx=15)
 
-    # أسماء الأعمدة كاملة
+
     tree_cols = ("Process ID", "Arrival Time", "Burst Time", "Priority")
     tree = ttk.Treeview(tab1, columns=tree_cols, show='headings', height=15)
     for c in tree_cols: tree.heading(c, text=c); tree.column(c, anchor="center")

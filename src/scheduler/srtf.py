@@ -10,14 +10,14 @@ def run_srtf(processes):
         p.completion_time = 0
 
     while completed != n:
-        # هات العمليات اللي وصلت ولسه مخلصتش
+
         available = [p for p in processes if p.arrival_time <= current_time and p.remaining_time > 0]
 
         if not available:
             current_time += 1
             continue
 
-        # الفرق هنا: بنختار صاحب أقل Remaining Time
+        
         current_p = min(available, key=lambda x: (x.remaining_time, x.arrival_time, x.pid))
 
         if current_p.start_time == -1:
