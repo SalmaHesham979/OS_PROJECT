@@ -1,52 +1,52 @@
 ============================================================
-        TEST SCENARIO: CONFLICT CASE (TIE-BREAK)
+         TEST SCENARIO: CONFLICT CASE (POLICY CONFLICT)
 ============================================================
-Description: This scenario tests how the system handles two processes (P1, P2) arriving at the same time (T=0) with identical priorities (2).
+Description: This scenario illustrates the core trade-off: Priority vs Efficiency. 
+A long process (P1) has high priority, while a short process (P2) has low priority.
 
 INPUT DATA:
 | Process | Arrival Time | Burst Time | Priority |
 |---------|--------------|------------|----------|
-| P1      | 0            | 5          | 2        |
-| P2      | 0            | 3          | 2        |
-| P3      | 5            | 2          | 1        |
+| P1      | 0            | 10         | 1        |
+| P2      | 1            | 2          | 5        |
+| P3      | 2            | 1          | 5        |
 
 ------------------------------------------------------------
 1. PRIORITY PREEMPTIVE RESULTS
 ------------------------------------------------------------
 Gantt Chart:
-|  P1  |  P3  |  P2  |
-0      5      7     10
+|     P1     |  P2  | P3 |
+0           10     12   13
 
 Output Metrics:
 | Process | WT | TAT | RT |
 |---------|----|-----|----|
-| P1      | 0  | 5   | 0  |
-| P2      | 7  | 10  | 7  |
-| P3      | 0  | 2   | 0  |
+| P1      | 0  | 10  | 0  |
+| P2      | 9  | 11  | 9  |
+| P3      | 10 | 11  | 10 |
 |---------|----|-----|----|
-| AVERAGE | 2.33| 5.67| 2.33 |
+| AVERAGE | 6.33| 10.67| 6.33 |
 
 ------------------------------------------------------------
 2. SRTF RESULTS
 ------------------------------------------------------------
 Gantt Chart:
-|  P2  |  P1  |  P3  |  P1  |
-0      3      5      7     10
+| P1 |  P2  | P3 |     P1     |
+0    1     3    4           13
 
 Output Metrics:
 | Process | WT | TAT | RT |
 |---------|----|-----|----|
-| P1      | 5  | 10  | 3  |
-| P2      | 0  | 3   | 0  |
-| P3      | 0  | 2   | 0  |
+| P1      | 3  | 13  | 0  |
+| P2      | 0  | 2   | 0  |
+| P3      | 1  | 2   | 1  |
 |---------|----|-----|----|
-| AVERAGE | 1.67| 5.00| 1.00 |
+| AVERAGE | 1.33| 5.67| 0.33 |
 
 KEY OBSERVATIONS:
-1. Priority Tie-break: At T=0, both P1 and P2 had the same Arrival and Priority. The algorithm chose P1 first because it has a smaller Process ID (P1 < P2).
-2. SRTF Logic: At T=0, SRTF chose P2 first, even though it arrived with P1, because P2 has a shorter Burst Time (3 vs 5). This explains why SRTF achieved a better Avg WT.
-3. Mid-Execution Preemption: In SRTF, P3 arrived at T=5 and immediately preempted the remaining part of P1 because P3's priority (1) was higher.
-4. Performance Gap: In this conflict, SRTF significantly outperformed Priority in all metrics (WT, TAT, and RT).
+1. Priority Choice: Priority scheduling keeps P1 running because it is more "urgent" (Priority 1), forcing shorter jobs to wait.
+2. SRTF Choice: SRTF preempts P1 as soon as P2 arrives because P2 is much shorter, significantly improving average waiting time.
+3. Trade-off: Priority favors importance; SRTF favors system throughput and speed.
 
 CONCLUSION:
-SRTF is the clear winner in this scenario. It resolved the initial conflict by choosing the shorter job, leading to better overall system efficiency.
+SRTF is more efficient for the overall system (lower Avg WT), but Priority is better if P1 is a critical system task that cannot wait.

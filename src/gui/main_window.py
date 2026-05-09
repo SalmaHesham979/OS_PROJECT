@@ -165,8 +165,12 @@ def start_app():
 
 ═══════════════════════════════════════════════
 """
-        text_summary.insert(tk.END, summary);
-        text_summary.config(state="disabled")
+        text_summary.insert(tk.END, summary)
+        
+        # Calculate exactly how many lines are in the summary
+        num_lines = summary.count('\n')
+        # Update the height of the text box to fit the text perfectly without scrolling
+        text_summary.config(height=num_lines, state="disabled")
 
     # --- 2. بناء الواجهة (UI) ---
     root = tk.Tk();
@@ -222,8 +226,28 @@ def start_app():
     for c in tree_cols: tree.heading(c, text=c); tree.column(c, anchor="center")
     tree.pack(fill="both", expand=True, padx=25, pady=20)
 
-    # Tab 2
-    gf = tk.LabelFrame(tab2, text=" Gantt Charts ", bg=color_bg, fg=color_pink, font=("Arial", 11, "bold"), padx=15,
+    # Tab 2 - Scrollable Setup
+    tab2_canvas = tk.Canvas(tab2, bg=color_bg, highlightthickness=0)
+    tab2_scrollbar = ttk.Scrollbar(tab2, orient="vertical", command=tab2_canvas.yview)
+    tab2_scrollable_frame = tk.Frame(tab2_canvas, bg=color_bg)
+
+    tab2_scrollable_frame.bind("<Configure>", lambda e: tab2_canvas.configure(scrollregion=tab2_canvas.bbox("all")))
+    tab2_canvas.create_window((0, 0), window=tab2_scrollable_frame, anchor="nw", tags="frame")
+    tab2_canvas.bind("<Configure>", lambda e: tab2_canvas.itemconfig("frame", width=e.width))
+
+    tab2_canvas.pack(side="left", fill="both", expand=True)
+    tab2_scrollbar.pack(side="right", fill="y")
+    tab2_canvas.configure(yscrollcommand=tab2_scrollbar.set)
+
+    def _on_mousewheel(event):
+        # Allow scrolling with mouse wheel when mouse is over tab 2
+        try:
+            tab2_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        except Exception:
+            pass
+    tab2_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    gf = tk.LabelFrame(tab2_scrollable_frame, text=" Gantt Charts ", bg=color_bg, fg=color_pink, font=("Arial", 11, "bold"), padx=15,
                        pady=10)
     gf.pack(fill="x", padx=25, pady=10)
     for n, v in [("Priority Preemptive", "canvas_p"), ("SRTF Scheduling", "canvas_s")]:
@@ -231,7 +255,7 @@ def start_app():
         globals()[v] = tk.Canvas(gf, height=85, bg="#181818", highlightthickness=1, highlightbackground=color_card);
         globals()[v].pack(fill="x", padx=15, pady=8)
 
-    res_f = tk.Frame(tab2, bg=color_bg);
+    res_f = tk.Frame(tab2_scrollable_frame, bg=color_bg);
     res_f.pack(fill="x", padx=20)
     for name, tv, lb in [("Priority", "tree_res_p", "lbl_avg_p"), ("SRTF", "tree_res_s", "lbl_avg_s")]:
         f = tk.LabelFrame(res_f, text=f" {name} Metrics ", bg=color_bg, fg=color_pink, font=("Arial", 10, "bold"),
@@ -247,7 +271,7 @@ def start_app():
         else:
             tree_res_s, lbl_avg_s = t, l
 
-    summary_f = tk.LabelFrame(tab2, text=" Conclusion & Tie-break Summary ", bg=color_bg, fg=color_pink,
+    summary_f = tk.LabelFrame(tab2_scrollable_frame, text=" Conclusion & Tie-break Summary ", bg=color_bg, fg=color_pink,
                               font=("Arial", 11, "bold"), padx=15, pady=10)
     summary_f.pack(fill="both", expand=True, padx=25, pady=15)
     text_summary = tk.Text(summary_f, height=8, bg="#181818", fg=color_white, relief="flat", font=("Courier New", 10),

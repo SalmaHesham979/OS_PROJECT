@@ -1,57 +1,57 @@
 ============================================================
-        TEST SCENARIO: STARVATION (LONG PROCESS DELAY)
+         TEST SCENARIO: STARVATION (LONG PROCESS DELAY)
 ============================================================
-Description: This scenario is specifically designed to test how a long, low-priority process (P1) can be "starved" of CPU time
-by a continuous stream of shorter, higher-priority processes.
+Description: This scenario tests how a low-priority process (P1) is "starved" by a stream of high-priority, short processes.
 
 INPUT DATA:
 | Process | Arrival Time | Burst Time | Priority |
 |---------|--------------|------------|----------|
-| P1      | 0            | 15         | 10       |
-| P2      | 1            | 2          | 1        |
-| P3      | 2            | 2          | 1        |
-| P4      | 3            | 2          | 1        |
+| P1      | 0            | 20         | 10       |
+| P2      | 1            | 3          | 1        |
+| P3      | 3            | 3          | 1        |
+| P4      | 5            | 3          | 1        |
+| P5      | 7            | 3          | 1        |
 
 ------------------------------------------------------------
 1. PRIORITY PREEMPTIVE RESULTS
 ------------------------------------------------------------
 Gantt Chart:
-| P1 | P2 | P3 | P4 |               P1               |
-0    1    3    5    7                               21
+| P1 | P2 | P3 | P4 | P5 |         P1         |
+0    1    4    7    10   13                  32
 
 Output Metrics:
 | Process | WT | TAT | RT |
 |---------|----|-----|----|
-| P1      | 6  | 21  | 0  |
-| P2      | 0  | 2   | 0  |
-| P3      | 1  | 3   | 1  |
-| P4      | 2  | 4   | 2  |
+| P1      | 12 | 32  | 0  |
+| P2      | 0  | 3   | 0  |
+| P3      | 1  | 4   | 1  |
+| P4      | 2  | 5   | 2  |
+| P5      | 3  | 6   | 3  |
 |---------|----|-----|----|
-| AVERAGE | 2.25| 7.50| 0.75 |
+| AVERAGE | 3.60| 10.00| 1.20 |
 
 ------------------------------------------------------------
 2. SRTF RESULTS
 ------------------------------------------------------------
 Gantt Chart:
-| P1 | P2 | P3 | P4 |               P1               |
-0    1    3    5    7                               21
+| P1 | P2 | P3 | P4 | P5 |         P1         |
+0    1    4    7    10   13                  32
 
 Output Metrics:
 | Process | WT | TAT | RT |
 |---------|----|-----|----|
-| P1      | 6  | 21  | 0  |
-| P2      | 0  | 2   | 0  |
-| P3      | 1  | 3   | 1  |
-| P4      | 2  | 4   | 2  |
+| P1      | 12 | 32  | 0  |
+| P2      | 0  | 3   | 0  |
+| P3      | 1  | 4   | 1  |
+| P4      | 2  | 5   | 2  |
+| P5      | 3  | 6   | 3  |
 |---------|----|-----|----|
-| AVERAGE | 2.25| 7.50| 0.75 |
+| AVERAGE | 3.60| 10.00| 1.20 |
 
 KEY OBSERVATIONS:
-1. Preemption Event: At T=1, Process P2 arrives. P1 is immediately preempted because P2 has a much higher priority (1 vs 10).
-2. The Starvation Chain: P1 stays in the "Ready Queue" from T=1 until T=7. It "starves" because the scheduler keeps favoring newer, more
-   "important" and "shorter" processes (P2, P3, P4).
-3. Identical Behavior: Both algorithms produced identical results here because the shortest jobs also had the highest priority levels.
+1. Starvation Event: P1 starts at T=0 but is immediately kicked out at T=1 because a much higher priority process (P2) arrives.
+2. Continuous Delay: Because P3, P4, and P5 keep arriving with high priority, P1 is forced to wait in the ready queue for a long time (Starvation).
+3. Metric Impact: P1's waiting time is very high compared to others.
 
 CONCLUSION:
-This case proves that without an "Aging" mechanism, low-priority tasks like P1 will always suffer from significant delays (Starvation)
-in preemptive systems like Priority and SRTF.
+In both algorithms, P1 suffers from starvation. This workload demonstrates the need for "Aging" in real-world operating systems to eventually increase the priority of long-waiting tasks.
