@@ -28,6 +28,13 @@ def validate_process_input(pid, arrival_str, burst_str, priority_str, all_proces
     except ValueError:
         errors.append("- Priority must be a valid whole number (no decimals, text, or symbols).")
 
+    # 1. Validation for PID Format (Must be a letter followed by digits, e.g., 'P1')
+    if not (len(pid) >= 2 and pid[0].isalpha() and pid[1:].isdigit()):
+        errors.append("- Process ID must be a letter followed by numbers (e.g., 'P1').")
+    elif int(pid[1:]) > 100: # Optional: Limit to 100 processes
+        errors.append("- Process ID number must be between 0 and 100.")
+    
+    # 2. Duplicate Check
     if any(p.pid == pid for p in all_processes):
         errors.append(f"- Process ID '{pid}' already exists.")
         
