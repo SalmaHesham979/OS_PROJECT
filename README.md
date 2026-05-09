@@ -73,4 +73,18 @@ Follow these exact steps to launch the simulator on your machine:
 
 ---
 
+### 📝 Assumptions & Limitations
+To ensure the accuracy and clarity of the simulation, the following technical assumptions were made:
 
+*   **Zero Context Switch Overhead:** The system assumes that the transition between processes happens instantaneously (Context Switch Time = 0), focusing purely on the scheduling logic.
+*   **Time Unit Uniformity:** All time inputs (Arrival and Burst) are treated as generic integer units (e.g., milliseconds).
+*   **Priority Range:** The system is optimized for a priority range of **0 to 10**, where **0 is the highest priority**.
+*   **Non-Aging Implementation:** This version focuses on standard Preemptive Priority; it does not implement "Aging," making it ideal for demonstrating **Starvation** scenarios for educational purposes.
+*   **Single Core Simulation:** The simulator models a single-processor environment where only one process can occupy the CPU at any given timestamp.
+
+---
+
+### 📊 Final Conclusion Logic
+The application includes an automated analysis engine that compares the results of both algorithms based on the **Average Waiting Time**. 
+*   **For Policy-Based Service:** Priority Scheduling is recommended.
+*   **For Maximum Efficiency:** SRTF is recommended as it generally yields the lowest average waiting time.
