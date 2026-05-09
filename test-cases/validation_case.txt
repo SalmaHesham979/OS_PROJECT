@@ -1,0 +1,38 @@
+============================================================
+           TEST SCENARIO: VALIDATION CASE (ERROR HANDLING)
+============================================================
+Description: This scenario tests the simulator's ability to identify and reject invalid inputs safely without crashing.
+
+TEST CASES:
+
+1. INVALID ARRIVAL TIME
+   Input: PID=P1, Arrival=-5, Burst=10, Priority=1
+   Expected Result: Error message "Arrival Time cannot be negative."
+
+2. INVALID BURST TIME (ZERO/NEGATIVE)
+   Input: PID=P2, Arrival=0, Burst=0, Priority=1
+   Expected Result: Error message "Burst Time must be greater than zero."
+
+3. DUPLICATE PROCESS ID
+   Input: 
+      - Entry 1: PID=P1, Arrival=0, Burst=5, Priority=1 (Accepted)
+      - Entry 2: PID=P1, Arrival=2, Burst=3, Priority=2
+   Expected Result: Error message "Process ID 'P1' already exists."
+
+4. INVALID PRIORITY RANGE
+   Input: PID=P3, Arrival=0, Burst=5, Priority=15
+   Expected Result: Error message "Wrong number for priority. Please enter a number in the range 0 to 10."
+
+5. MISSING FIELDS
+   Input: PID=P4, Arrival=, Burst=5, Priority=1
+   Expected Result: Error message "All fields must be filled!"
+
+6. NON-NUMERIC INPUT
+   Input: PID=P5, Arrival=abc, Burst=5, Priority=1
+   Expected Result: Error message "Arrival Time must be a valid number."
+
+------------------------------------------------------------
+CONCLUSION:
+The simulator successfully handles all edge cases and prevents 
+invalid data from entering the calculation engine.
+============================================================
