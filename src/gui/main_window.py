@@ -13,7 +13,6 @@ from util.validators import validate_process_input
 def start_app():
     all_processes = []
 
-    # --- باليتة الألوان (الأسود والبينك) ---
     color_bg = "#121212"  # خلفية سوداء مطفية
     color_card = "#1E1E1E"  # رمادي داكن للفريمات
     color_pink = "#FF69B4"  # Hot Pink للزراير واللمسات
