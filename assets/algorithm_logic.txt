@@ -1,0 +1,66 @@
+================================================================
+           ALGORITHM LOGIC & PSEUDOCODE
+================================================================
+Project: Priority vs SRTF Comparison
+Course: Operating Systems
+
+This document describes the logical steps (Pseudocode) for the 
+two scheduling algorithms implemented in this simulator.
+
+----------------------------------------------------------------
+1. PREEMPTIVE PRIORITY SCHEDULING
+----------------------------------------------------------------
+Logic: Select the process with the highest priority (smallest 
+integer value). If a new process arrives with a higher priority 
+than the current one, it preempts the current process.
+
+Pseudocode:
+1. Initialize Current_Time = 0.
+2. While there are incomplete processes:
+   a. Filter all processes that have (Arrival_Time <= Current_Time) 
+      and (Remaining_Time > 0).
+   b. If no processes are available:
+      - Increment Current_Time.
+   c. Else:
+      - Select process 'P' with the MINIMUM Priority Value.
+      - TIE-BREAK: If priorities are equal, select 'P' with 
+        earlier Arrival_Time. If still tied, select lower PID.
+      - Execute 'P' for 1 time unit.
+      - Decrement P.Remaining_Time.
+      - Increment Current_Time.
+      - If P.Remaining_Time == 0:
+        - Set P.Completion_Time = Current_Time.
+        - Calculate WT, TAT, and RT.
+
+----------------------------------------------------------------
+2. SHORTEST REMAINING TIME FIRST (SRTF)
+----------------------------------------------------------------
+Logic: Select the process with the shortest remaining burst time. 
+If a new process arrives with a shorter remaining time than the 
+currently running one, it preempts it.
+
+Pseudocode:
+1. Initialize Current_Time = 0.
+2. While there are incomplete processes:
+   a. Filter all processes that have (Arrival_Time <= Current_Time) 
+      and (Remaining_Time > 0).
+   b. If no processes are available:
+      - Increment Current_Time.
+   c. Else:
+      - Select process 'P' with the MINIMUM Remaining_Time.
+      - TIE-BREAK: If times are equal, select 'P' with 
+        earlier Arrival_Time. If still tied, select lower PID.
+      - Execute 'P' for 1 time unit.
+      - Decrement P.Remaining_Time.
+      - Increment Current_Time.
+      - If P.Remaining_Time == 0:
+        - Set P.Completion_Time = Current_Time.
+        - Calculate WT, TAT, and RT.
+
+----------------------------------------------------------------
+3. METRICS FORMULAS
+----------------------------------------------------------------
+- Turnaround Time (TAT) = Completion Time - Arrival Time
+- Waiting Time (WT) = Turnaround Time - Burst Time
+- Response Time (RT) = Start Time - Arrival Time
+================================================================
