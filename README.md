@@ -15,10 +15,10 @@ The system provides a visual representation using Gantt Charts and calculates ke
 1. Salma Hesham Elsayed Shawkey
 2. Salma Mohamed Ramadan Mohamed
 3. Razan Mohammed Hussien Abdl-ALeem
-4. 
-5. 
-6. 
-7. 
+4. Rawan Osama Youssef Taha
+5. Sarah Mohamed Lotfy Mohamed
+6. Reem Gamal Al-Sayed Noaman Moussa
+7. Salma yasser sobhy
 ---
 ### ✨ Key Features & Capabilities
 
