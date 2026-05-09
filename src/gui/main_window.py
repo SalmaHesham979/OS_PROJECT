@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import copy
 
-# استيراد الموديلات والمنطق
 from model.process import Process
 from scheduler.priority import run_priority_preemptive
 from scheduler.srtf import run_srtf
@@ -13,15 +12,13 @@ from util.validators import validate_process_input
 def start_app():
     all_processes = []
 
-    # --- باليتة الألوان (الأسود والبينك) ---
-    color_bg = "#121212"  # خلفية سوداء مطفية
-    color_card = "#1E1E1E"  # رمادي داكن للفريمات
-    color_pink = "#FF69B4"  # Hot Pink للزراير واللمسات
-    color_white = "#FFFFFF"  # أبيض للكلام
-    color_input = "#2D2D2D"  # خلفية خانات الإدخال
+    color_bg = "#121212"  
+    color_card = "#1E1E1E"  
+    color_pink = "#FF69B4"  
+    color_white = "#FFFFFF"  
+    color_input = "#2D2D2D"  
     gantt_pinks = ["#FF69B4", "#FF1493", "#C71585", "#DB7093", "#FF82AB", "#FFB6C1"]
 
-    # --- 1. الوظائف (Functions) ---
     def clear_data():
         all_processes.clear()
         for item in tree.get_children(): tree.delete(item)
